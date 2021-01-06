@@ -1,0 +1,123 @@
+.body
+{
+  padding: 0px;
+  margin: 0px;
+  background-position: center;
+  background-image: url(../img/mohamed.png);
+  background-size: cover;
+  
+  
+}
+
+.login-clean {
+  background: #f1f7fc;
+  padding:  0px;
+  max-width: 600px;
+  width: 100%;
+  margin: auto;
+  opacity: 0.8;
+}
+
+.login-clean form {
+  max-width: 600px;
+  width: 100%;
+  margin: 0px auto 0px auto;
+  background-color: #5f6368;
+  padding: 10px 50px 30px 50px;
+  border-radius: 0px 0px 10px 10px;
+  color: #505e6c;
+}
+
+
+.login-clean form .form-control {
+  background: #f7f9fc;
+  max-width: 300px;
+  border: none;
+  border-bottom: 1px solid #dfe7f1;
+  border-radius: 0; 
+  box-shadow: none;
+  outline: none;
+  color: inherit;
+  text-indent: 8px;
+  height: 25px;
+}
+
+.login-clean form .btn-primary {
+  background: #17a2b8;
+  border: none;
+  max-width: 300px;
+  border-radius: 4px;
+  padding: 5px;
+  box-shadow: none;
+  margin-top: 26px;
+  text-shadow: none;
+  outline: none !important;
+}
+
+.login-clean form .btn-primary:hover, .login-clean form .btn-primary:active {
+  background: #e0e2e6;
+  color: #0b4f86;
+}
+
+.login-clean form .btn-primary:active {
+  transform: translateY(1px);
+}
+
+.login-clean form .forgot {
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  color: #6f7a85;
+  opacity: 0.8;
+  text-decoration: none;
+}
+
+.login-clean form .forgot:hover, .login-clean form .forgot:active {
+  opacity: 1;
+  text-decoration: none;
+
+}
+
+.label
+{
+  color: #dfe7f1;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 0px;
+  margin: 0px;
+}
+
+.titulo
+{
+  background-color: #17a2b8;
+  color: #dee1e4;
+  opacity: 0.8;
+  max-width: 600px;
+  margin:20px auto 0px auto;
+  padding: 5px;
+  border-radius: 10px 10px 0px 0px;
+}
+.select 
+{
+  background: #f7f9fc;
+  border: none;
+  border-bottom: 1px solid #dfe7f1;
+  border-radius: 0; 
+  box-shadow: none;
+  outline: none;
+  color: inherit;
+  height: 25px;
+}
+
+.opcoes
+{
+    height: 22px;
+    width: 400px;
+    line-height: 20px;
+    height: 20px;
+    font-size: 16px;
+      
+    
+    
+}
+

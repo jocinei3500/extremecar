@@ -1,0 +1,148 @@
+<?php
+function ValidateEmail($email)
+{
+   $pattern = '/^([0-9a-z]([-.\w]*[0-9a-z])*@(([0-9a-z])+([-\w]*[0-9a-z])*\.)+[a-z]{2,6})$/i';
+   return preg_match($pattern, $email);
+}
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['formid']) && $_POST['formid'] == 'form1')
+{
+   $mailto = 'yourname@yourdomain.com';
+   $mailfrom = isset($_POST['email']) ? $_POST['email'] : $mailto;
+   $subject = 'Website form';
+   $message = 'Values submitted from web site form:';
+   $success_url = '';
+   $error_url = '';
+   $eol = "\n";
+   $error = '';
+   $internalfields = array ("submit", "reset", "send", "filesize", "formid", "captcha_code", "recaptcha_challenge_field", "recaptcha_response_field", "g-recaptcha-response");
+   $boundary = md5(uniqid(time()));
+   $header  = 'From: '.$mailfrom.$eol;
+   $header .= 'Reply-To: '.$mailfrom.$eol;
+   $header .= 'MIME-Version: 1.0'.$eol;
+   $header .= 'Content-Type: multipart/mixed; boundary="'.$boundary.'"'.$eol;
+   $header .= 'X-Mailer: PHP v'.phpversion().$eol;
+
+   try
+   {
+      if (!ValidateEmail($mailfrom))
+      {
+         $error .= "The specified email address (" . $mailfrom . ") is invalid!\n<br>";
+         throw new Exception($error);
+      }
+      $message .= $eol;
+      $message .= "IP Address : ";
+      $message .= $_SERVER['REMOTE_ADDR'];
+      $message .= $eol;
+      foreach ($_POST as $key => $value)
+      {
+         if (!in_array(strtolower($key), $internalfields))
+         {
+            if (is_array($value))
+            {
+               $message .= ucwords(str_replace("_", " ", $key)) . " : " . implode(",", $value) . $eol;
+            }
+            else
+            {
+               $message .= ucwords(str_replace("_", " ", $key)) . " : " . $value . $eol;
+            }
+         }
+      }
+      $body  = 'This is a multi-part message in MIME format.'.$eol.$eol;
+      $body .= '--'.$boundary.$eol;
+      $body .= 'Content-Type: text/plain; charset=ISO-8859-1'.$eol;
+      $body .= 'Content-Transfer-Encoding: 8bit'.$eol;
+      $body .= $eol.stripslashes($message).$eol;
+      if (!empty($_FILES))
+      {
+         foreach ($_FILES as $key => $value)
+         {
+             if ($_FILES[$key]['error'] == 0)
+             {
+                $body .= '--'.$boundary.$eol;
+                $body .= 'Content-Type: '.$_FILES[$key]['type'].'; name='.$_FILES[$key]['name'].$eol;
+                $body .= 'Content-Transfer-Encoding: base64'.$eol;
+                $body .= 'Content-Disposition: attachment; filename='.$_FILES[$key]['name'].$eol;
+                $body .= $eol.chunk_split(base64_encode(file_get_contents($_FILES[$key]['tmp_name']))).$eol;
+             }
+         }
+      }
+      $body .= '--'.$boundary.'--'.$eol;
+      if ($mailto != '')
+      {
+         mail($mailto, $subject, $body, $header);
+      }
+      header('Location: '.$success_url);
+   }
+   catch (Exception $e)
+   {
+      $errorcode = file_get_contents($error_url);
+      $replace = "##error##";
+      $errorcode = str_replace($replace, $e->getMessage(), $errorcode);
+      echo $errorcode;
+   }
+   exit;
+}
+?>
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Cadastro de Clientes
+</title>
+<link href="Untitled1.css" rel="stylesheet">
+<link href="index.css" rel="stylesheet">
+</head>
+<body>
+<div id="wb_Form1" style="position:absolute;left:23px;top:18px;width:675px;height:646px;z-index:35;">
+<form name="contact" method="post" action="" enctype="multipart/form-data" id="Form1">
+<input type="hidden" name="formid" value="form1">
+<label for="Combobox1" id="Label1" style="position:absolute;left:10px;top:15px;width:76px;height:16px;line-height:16px;z-index:0;">Subject:</label>
+<select name="subject" size="1" id="Combobox1" style="position:absolute;left:104px;top:15px;width:200px;height:28px;z-index:1;">
+<option selected value="General Feedback">General Feedback</option>
+<option value="Contact Request">Contact Request</option>
+<option value="Price Quote">Price Quote</option>
+<option value="Employment Information">Employment Information</option>
+</select>
+<label for="Editbox1" id="Label2" style="position:absolute;left:10px;top:48px;width:76px;height:16px;line-height:16px;z-index:2;">Name:</label>
+<input type="text" id="Editbox1" style="position:absolute;left:104px;top:48px;width:190px;height:16px;z-index:3;" name="name" value="" spellcheck="false">
+<label for="Editbox2" id="Label3" style="position:absolute;left:10px;top:79px;width:76px;height:16px;line-height:16px;z-index:4;">Email:</label>
+<input type="text" id="Editbox2" style="position:absolute;left:104px;top:79px;width:190px;height:16px;z-index:5;" name="email" value="" spellcheck="false">
+<label for="TextArea1" id="Label4" style="position:absolute;left:10px;top:110px;width:76px;height:16px;line-height:16px;z-index:6;">Address:</label>
+<textarea name="Address" id="TextArea1" style="position:absolute;left:104px;top:110px;width:190px;height:90px;z-index:7;" rows="5" cols="21" spellcheck="false"></textarea>
+<label for="Editbox3" id="Label5" style="position:absolute;left:10px;top:215px;width:76px;height:16px;line-height:16px;z-index:8;">City:</label>
+<input type="text" id="Editbox3" style="position:absolute;left:104px;top:215px;width:190px;height:16px;z-index:9;" name="city" value="" spellcheck="false">
+<label for="Editbox4" id="Label6" style="position:absolute;left:10px;top:246px;width:76px;height:16px;line-height:16px;z-index:10;">State:</label>
+<input type="text" id="Editbox4" style="position:absolute;left:104px;top:246px;width:190px;height:16px;z-index:11;" name="state" value="" spellcheck="false">
+<label for="Editbox5" id="Label7" style="position:absolute;left:10px;top:277px;width:76px;height:16px;line-height:16px;z-index:12;">Zip</label>
+<input type="text" id="Editbox5" style="position:absolute;left:104px;top:277px;width:190px;height:16px;z-index:13;" name="zip" value="" spellcheck="false">
+<label for="Editbox6" id="Label8" style="position:absolute;left:10px;top:308px;width:76px;height:16px;line-height:16px;z-index:14;">Home Phone:</label>
+<input type="text" id="Editbox6" style="position:absolute;left:104px;top:308px;width:190px;height:16px;z-index:15;" name="Home Phone" value="" spellcheck="false">
+<label for="Editbox7" id="Label9" style="position:absolute;left:10px;top:339px;width:76px;height:16px;line-height:16px;z-index:16;">Work Phone</label>
+<input type="text" id="Editbox7" style="position:absolute;left:104px;top:339px;width:190px;height:16px;z-index:17;" name="Work Phone" value="" spellcheck="false">
+<label for="Editbox8" id="Label10" style="position:absolute;left:10px;top:370px;width:76px;height:16px;line-height:16px;z-index:18;">Fax Number</label>
+<input type="text" id="Editbox8" style="position:absolute;left:104px;top:370px;width:190px;height:16px;z-index:19;" name="Fax Number" value="" spellcheck="false">
+<label for="" id="Label11" style="position:absolute;left:10px;top:401px;width:219px;height:16px;line-height:16px;z-index:20;">When is the best time to contact you?</label>
+<label for="RadioButton1" id="Label12" style="position:absolute;left:10px;top:426px;width:76px;height:16px;line-height:16px;z-index:21;">Morning</label>
+<div id="wb_RadioButton1" style="position:absolute;left:104px;top:426px;width:20px;height:20px;z-index:22;">
+<input type="radio" id="RadioButton1" name="q[1]" value="Morning" checked style="position:absolute;left:0;top:0;"><label for="RadioButton1"></label></div>
+<label for="RadioButton2" id="Label13" style="position:absolute;left:10px;top:451px;width:76px;height:16px;line-height:16px;z-index:23;">Afternoon</label>
+<div id="wb_RadioButton2" style="position:absolute;left:104px;top:451px;width:20px;height:20px;z-index:24;">
+<input type="radio" id="RadioButton2" name="q[1]" value="Afternoon" style="position:absolute;left:0;top:0;"><label for="RadioButton2"></label></div>
+<label for="RadioButton3" id="Label14" style="position:absolute;left:10px;top:476px;width:76px;height:16px;line-height:16px;z-index:25;">Evening</label>
+<div id="wb_RadioButton3" style="position:absolute;left:104px;top:476px;width:20px;height:20px;z-index:26;">
+<input type="radio" id="RadioButton3" name="q[1]" value="Evening" style="position:absolute;left:0;top:0;"><label for="RadioButton3"></label></div>
+<label for="" id="Label15" style="position:absolute;left:10px;top:501px;width:219px;height:16px;line-height:16px;z-index:27;">What is the best way to contact you?</label>
+<label for="RadioButton4" id="Label16" style="position:absolute;left:10px;top:526px;width:76px;height:16px;line-height:16px;z-index:28;">Phone</label>
+<div id="wb_RadioButton4" style="position:absolute;left:104px;top:526px;width:20px;height:20px;z-index:29;">
+<input type="radio" id="RadioButton4" name="q[2]" value="Phone" checked style="position:absolute;left:0;top:0;"><label for="RadioButton4"></label></div>
+<label for="RadioButton5" id="Label17" style="position:absolute;left:10px;top:551px;width:76px;height:16px;line-height:16px;z-index:30;">E-mail</label>
+<div id="wb_RadioButton5" style="position:absolute;left:104px;top:551px;width:20px;height:20px;z-index:31;">
+<input type="radio" id="RadioButton5" name="q[2]" value="E-mail" style="position:absolute;left:0;top:0;"><label for="RadioButton5"></label></div>
+<label for="RadioButton6" id="Label18" style="position:absolute;left:10px;top:576px;width:76px;height:16px;line-height:16px;z-index:32;">Fax</label>
+<div id="wb_RadioButton6" style="position:absolute;left:104px;top:576px;width:20px;height:20px;z-index:33;">
+<input type="radio" id="RadioButton6" name="q[2]" value="Fax" style="position:absolute;left:0;top:0;"><label for="RadioButton6"></label></div>
+<input type="submit" id="Button1" name="" value="Send" style="position:absolute;left:104px;top:601px;width:96px;height:25px;z-index:34;">
+</form>
+</div>
+</body>
+</html>
